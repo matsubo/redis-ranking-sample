@@ -1,0 +1,14 @@
+{
+  "name": "ranking",
+  "version": "0.0.1",
+  "main": "index.php",
+  "dependencies": {
+    "bootstrap": "~2.3.1",
+    "jquery": "~1.8.3"
+  },
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "components"
+  ]
+}
