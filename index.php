@@ -71,7 +71,7 @@
       <h1>AKB勝手にランキング</h1>
 
 <p>
-応援したい人に投票しよう！
+応援したい人に投票しよう！ 
 </p>
 
 <table class="table table-striped">
@@ -164,6 +164,12 @@ foreach ($ranking->getRange(0, -1, true) as $name => $value) {
 
 <h2>メモ</h2>
 <a href="http://matsu.teraren.com/blog/2013/04/28/redis-ranking-api/">Redis-Ranking</a>を使って構築しています。
+
+<br />
+<br />
+<br />
+<br />
+<br />
 
 
     </div> <!-- /container -->
