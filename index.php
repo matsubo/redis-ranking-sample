@@ -91,51 +91,22 @@ $redis->connect('127.0.0.1', 6379);
 $ranking = new Ranking($key = 'akb', $redis);
 
 
-
-/*
-$ranking->setUserScore('中塚智実',0);
-$ranking->setUserScore('松原夏海',0);
-$ranking->setUserScore('小森美果',0);
-$ranking->setUserScore('鬼頭桃菜',0);
-$ranking->setUserScore('佐藤聖羅',0);
-$ranking->setUserScore('向田茉夏',0);
-$ranking->setUserScore('小柳有沙',0);
-$ranking->setUserScore('仲川遥香',0);
-$ranking->setUserScore('荻野利沙',0);
-$ranking->setUserScore('大脇有紗',0);
-$ranking->setUserScore('藤本美月',0);
-$ranking->setUserScore('岸野里香',0);
-$ranking->setUserScore('山本ひとみ',0);
-$ranking->setUserScore('板野友美',0);
-$ranking->setUserScore('河西智美',0);
-$ranking->setUserScore('仁藤萌乃',0);
-$ranking->setUserScore('秋元才加',0);
-$ranking->setUserScore('桑原みずき',0);
-$ranking->setUserScore('高田志織',0);
-$ranking->setUserScore('平松可奈子',0);
-$ranking->setUserScore('矢神久美',0);
-$ranking->setUserScore('赤枝里々奈',0);
-$ranking->setUserScore('小木曽汐莉',0);
-$ranking->setUserScore('秦佐和子',0);
-$ranking->setUserScore('上野圭澄',0);
-$ranking->setUserScore('原望奈美',0);
-$ranking->setUserScore('小林絵未梨',0);
-$ranking->setUserScore('篠原栞那',0);
-$ranking->setUserScore('福本愛菜',0);
-$ranking->setUserScore('前田敦子',0);
-$ranking->setUserScore('奥真奈美',0);
-$ranking->setUserScore('小野恵令奈',0);
-$ranking->setUserScore('佐藤夏希',0);
-$ranking->setUserScore('増田有華',0);
-$ranking->setUserScore('仲谷明香',0);
-$ranking->setUserScore('米沢瑠美',0);
-$ranking->setUserScore('平田璃香子',0);
+/* initialize code.
+$member_text = file_get_contents('member.txt');
+$member_array = explode("\n", $member_text);
+foreach ($member_array as $member) {
+    $member = trim($member);
+    if (!$member) {
+        continue;
+    }
+    if ($ranking->getScore($member)) {
+        continue;
+    }
+    $ranking->setUserScore($member, 0);
+}
  */
 
-
-if (isset($_REQUEST['mode']) && $_REQUEST['mode']  == 'add') {
-    $ranking->setUserScore($_REQUEST['text'], -1);
-} elseif (isset($_REQUEST['mode']) && $_REQUEST['mode']  == 'increment') {
+if (isset($_REQUEST['mode']) && $_REQUEST['mode']  == 'increment') {
     $ranking->incrementScore($_REQUEST['text'], -1);
 }
 
@@ -151,7 +122,7 @@ foreach ($ranking->getRange(0, -1, true) as $name => $value) {
 
 
 
-
+<!--
 <form method="post" action="?mode=add">
   <fieldset>
     <legend>追加</legend>
@@ -160,6 +131,7 @@ foreach ($ranking->getRange(0, -1, true) as $name => $value) {
     <button type="submit" class="btn">追加</button>
   </fieldset>
 </form>
+-->
 
 
 <h2>メモ</h2>
