@@ -81,11 +81,11 @@
 
 <?php
 
-require_once 'vendor/autoload.php';
+require_once __DIR__ . '/vendor/autoload.php';
 
 use Matsubo\Redis\Ranking;
 
-$redis = new \Redis();
+$redis = new \Redis;
 $redis->connect('127.0.0.1', 6379);
 
 $ranking = new Ranking($key = 'akb', $redis);
@@ -99,15 +99,17 @@ foreach ($member_array as $member) {
     if (!$member) {
         continue;
     }
-    if ($ranking->getScore($member)) {
+    if ($ranking->getScore($member) !== false) {
         continue;
     }
     $ranking->setUserScore($member, 0);
 }
  */
-
+$text = isset($_REQUEST['text']) ? $_REQUEST['text'] : '';
 if (isset($_REQUEST['mode']) && $_REQUEST['mode']  == 'increment') {
-    $ranking->incrementScore($_REQUEST['text'], -1);
+    if ($ranking->getScore($text) !== false) {
+        $ranking->incrementScore($text, -1);
+    }
 }
 
 $i = 1;
@@ -121,6 +123,12 @@ foreach ($ranking->getRange(0, -1, true) as $name => $value) {
 </table>
 
 
+<h2>メンバー追加方法</h2>
+<p>
+こちらのファイルに対してpull requestを送って欲しいです。
+<br />
+<a href="https://github.com/matsubo/redis-ranking-sample/blob/master/member.txt">https://github.com/matsubo/redis-ranking-sample/blob/master/member.txt</a>
+</p>
 
 <!--
 <form method="post" action="?mode=add">
@@ -150,18 +158,6 @@ foreach ($ranking->getRange(0, -1, true) as $name => $value) {
     ================================================== -->
     <!-- Placed at the end of the document so the pages load faster -->
     <script src="components/bootstrap/docs/assets/js/jquery.js"></script>
-    <script src="components/bootstrap/docs/assets/js/bootstrap-transition.js"></script>
-    <script src="components/bootstrap/docs/assets/js/bootstrap-alert.js"></script>
-    <script src="components/bootstrap/docs/assets/js/bootstrap-modal.js"></script>
-    <script src="components/bootstrap/docs/assets/js/bootstrap-dropdown.js"></script>
-    <script src="components/bootstrap/docs/assets/js/bootstrap-scrollspy.js"></script>
-    <script src="components/bootstrap/docs/assets/js/bootstrap-tab.js"></script>
-    <script src="components/bootstrap/docs/assets/js/bootstrap-tooltip.js"></script>
-    <script src="components/bootstrap/docs/assets/js/bootstrap-popover.js"></script>
-    <script src="components/bootstrap/docs/assets/js/bootstrap-button.js"></script>
-    <script src="components/bootstrap/docs/assets/js/bootstrap-collapse.js"></script>
-    <script src="components/bootstrap/docs/assets/js/bootstrap-carousel.js"></script>
-    <script src="components/bootstrap/docs/assets/js/bootstrap-typeahead.js"></script>
 
   </body>
 </html>
