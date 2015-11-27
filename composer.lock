@@ -1,0 +1,69 @@
+{
+    "_readme": [
+        "This file locks the dependencies of your project to a known state",
+        "Read more about it at http://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file"
+    ],
+    "hash": "757b6856a2c2c05e8d047b4db2e0bc04",
+    "packages": [
+        {
+            "name": "redis/ranking",
+            "version": "1.0.1",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/matsubo/redis-ranking.git",
+                "reference": "1.0.1"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/matsubo/redis-ranking/zipball/1.0.1",
+                "reference": "1.0.1",
+                "shasum": ""
+            },
+            "require-dev": {
+                "devster/ubench": "1.1.*-dev",
+                "phpunit/phpunit": "3.*"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-0": {
+                    "Matsubo": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "PHP3"
+            ],
+            "authors": [
+                {
+                    "name": "Yuki Matsukura",
+                    "email": "matsubokkuri@gmail.com"
+                }
+            ],
+            "description": "Wrapping Redis's sorted set APIs for specializing ranking operations.",
+            "homepage": "https://github.com/matsubo/redis-ranking",
+            "keywords": [
+                "ranking",
+                "realtime",
+                "redis",
+                "sort"
+            ],
+            "time": "2013-04-28 04:56:15"
+        }
+    ],
+    "packages-dev": [
+
+    ],
+    "aliases": [
+
+    ],
+    "minimum-stability": "stable",
+    "stability-flags": [
+
+    ],
+    "platform": [
+
+    ],
+    "platform-dev": [
+
+    ]
+}
