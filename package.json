@@ -1,0 +1,23 @@
+{
+  "name": "ranking",
+  "version": "1.0.0",
+  "description": "Sample application for Redis-Ranking ===",
+  "main": "index.js",
+  "dependencies": {
+    "bower": "^1.6.7"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/matsubo/redis-ranking-sample.git"
+  },
+  "author": "Yuki Matsukura",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/matsubo/redis-ranking-sample/issues"
+  },
+  "homepage": "https://github.com/matsubo/redis-ranking-sample#readme"
+}
