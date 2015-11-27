@@ -3,8 +3,8 @@
   "version": "0.0.1",
   "main": "index.php",
   "dependencies": {
-    "bootstrap": "~2.3.1",
-    "jquery": "~1.8.3"
+    "bootstrap": "~3.3.6",
+    "jquery": "~2.1.4"
   },
   "ignore": [
     "**/.*",
