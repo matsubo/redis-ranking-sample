@@ -8,6 +8,12 @@
     <meta name="author" content="Yuki Matsukura">
 
     <link href="bower_components/bootstrap/dist/css/bootstrap.min.css" rel="stylesheet">
+<style type="text/css">
+div.banner {
+margin-top: 1em;
+margin-bottom: 1em;
+}
+</style>
 
     <!-- HTML5 shim, for IE6-8 support of HTML5 elements -->
     <!--[if lt IE 9]>
@@ -38,12 +44,6 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
   <div class="container-fluid">
     <!-- Brand and toggle get grouped for better mobile display -->
     <div class="navbar-header">
-      <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1" aria-expanded="false">
-        <span class="sr-only">Toggle navigation</span>
-        <span class="icon-bar"></span>
-        <span class="icon-bar"></span>
-        <span class="icon-bar"></span>
-      </button>
       <a class="navbar-brand" href="?">AKB勝手に総選挙</a>
     </div>
 
@@ -60,6 +60,12 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
 <p>
 応援したい人に投票しよう！ 
 </p>
+
+<div class="row banner">
+  <div class="col-md-12">
+    <?php include './ad.inc.php'; ?>
+  </div>
+</div>
 
 <table class="table table-striped">
 <tr>
@@ -96,6 +102,14 @@ foreach ($ranking->getRange(0, -1, true) as $name => $value) {
 </table>
 
 
+
+<div class="row banner">
+  <div class="col-md-12">
+    <?php include './ad.inc.php'; ?>
+  </div>
+</div>
+
+
 <h2>メンバー追加方法</h2>
 <p>
 こちらのファイルに対してpull requestを送って欲しいです。
@@ -107,8 +121,6 @@ foreach ($ranking->getRange(0, -1, true) as $name => $value) {
 <h2>メモ</h2>
 <a href="http://matsu.teraren.com/blog/2013/04/28/redis-ranking-api/">Redis-Ranking</a>を使って構築しています。
 
-<br />
-<br />
 <br />
 <br />
 <br />

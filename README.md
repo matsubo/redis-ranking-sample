@@ -6,6 +6,16 @@ Abstract
 - Sample application for Redis Ranking
   - https://github.com/matsubo/redis-ranking
 
+Requirements
+---
+- PHP
+  - >=5.5
+- php-redis
+- Redis
+- NodeJS
+
+
+
 Setup
 ---
 
