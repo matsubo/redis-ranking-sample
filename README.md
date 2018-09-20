@@ -9,7 +9,7 @@ Abstract
 Requirements
 ---
 - PHP
-  - >=5.5
+  - `>=5.5`
 - php-redis
 - Redis
 - NodeJS
