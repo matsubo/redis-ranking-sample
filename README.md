@@ -12,8 +12,6 @@ Requirements
   - `>=5.5`
 - php-redis
 - Redis
-- NodeJS
-
 
 
 Setup
@@ -22,8 +20,6 @@ Setup
 ```
 % git clone git://github.com/matsubo/redis-ranking-sample.git
 % cd redis-ranking-sample
-% npm install
-% bower install
 % composer install
 ```
 
