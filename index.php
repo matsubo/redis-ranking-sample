@@ -123,7 +123,7 @@ foreach ($ranking->getRange(0, -1, true) as $name => $value) {
 
 
 <h2>メモ</h2>
-<a href="http://matsu.teraren.com/blog/2013/04/28/redis-ranking-api/">Redis-Ranking</a>を使って構築しています。
+<a href="https://matsu.teraren.com/blog/2013/04/28/redis-ranking-api/">Redis-Ranking</a>を使って構築しています。
 
 <br />
 <br />
@@ -132,7 +132,7 @@ foreach ($ranking->getRange(0, -1, true) as $name => $value) {
 <footer>
 <div class="row">
 <div class="col-md-12 text-right">
-<a href="http://matsu.teraren.com/blog/">&copy Yuki Matsukura</a>
+<a href="https://matsu.teraren.com/blog/">&copy Yuki Matsukura</a>
 </div>
 </footer>
 
