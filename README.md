@@ -10,8 +10,9 @@ Requirements
 ---
 - PHP
   - `>=5.5`
+  - `>=7`
 - php-redis
-- Redis
+- Redis server
 
 
 Setup
@@ -37,6 +38,6 @@ Seed data
 
 Demo
 ---
-- http://matsu.teraren.com/ranking/
+- https://matsu.teraren.com/ranking/
 
 
