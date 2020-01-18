@@ -1,10 +1,10 @@
 {
     "_readme": [
         "This file locks the dependencies of your project to a known state",
-        "Read more about it at http://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
+        "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "hash": "757b6856a2c2c05e8d047b4db2e0bc04",
+    "content-hash": "adf25887fe19d995e2c8a1c4af776e55",
     "packages": [
         {
             "name": "redis/ranking",
@@ -12,12 +12,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/matsubo/redis-ranking.git",
-                "reference": "1.0.1"
+                "reference": "a3c013ec3cf5d52de54021fafbec8772e2962a34"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/matsubo/redis-ranking/zipball/1.0.1",
-                "reference": "1.0.1",
+                "url": "https://api.github.com/repos/matsubo/redis-ranking/zipball/a3c013ec3cf5d52de54021fafbec8772e2962a34",
+                "reference": "a3c013ec3cf5d52de54021fafbec8772e2962a34",
                 "shasum": ""
             },
             "require-dev": {
@@ -48,7 +48,7 @@
                 "redis",
                 "sort"
             ],
-            "time": "2013-04-28 04:56:15"
+            "time": "2013-04-28T04:56:15+00:00"
         }
     ],
     "packages-dev": [],
