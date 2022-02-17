@@ -79,7 +79,6 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
 
 <?php
 
-ini_set('display_errors', 1);
 require_once __DIR__ . '/vendor/autoload.php';
 
 use Matsubo\Redis\Ranking;
