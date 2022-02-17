@@ -133,7 +133,7 @@ foreach ($ranking->getRange(0, -1, true) as $name => $value) {
 <footer>
 <div class="row">
 <div class="col-md-12 text-right">
-<a href="https://matsu.teraren.com/blog/">&copy Yuki Matsukura</a>
+<a href="https://twitter.com/matsubokkuri">@matsubokkuri</a>
 </div>
 </footer>
 
