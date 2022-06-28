@@ -4,25 +4,31 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "adf25887fe19d995e2c8a1c4af776e55",
+    "content-hash": "9cbe2e377dc0d6f78b5763e7293aa4ab",
     "packages": [
         {
             "name": "redis/ranking",
-            "version": "1.0.1",
+            "version": "1.2.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/matsubo/redis-ranking.git",
-                "reference": "a3c013ec3cf5d52de54021fafbec8772e2962a34"
+                "reference": "d0db41578565840ba3ba46ae9c02d536f9be6cfb"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/matsubo/redis-ranking/zipball/a3c013ec3cf5d52de54021fafbec8772e2962a34",
-                "reference": "a3c013ec3cf5d52de54021fafbec8772e2962a34",
+                "url": "https://api.github.com/repos/matsubo/redis-ranking/zipball/d0db41578565840ba3ba46ae9c02d536f9be6cfb",
+                "reference": "d0db41578565840ba3ba46ae9c02d536f9be6cfb",
                 "shasum": ""
             },
+            "require": {
+                "php": ">=5.5.0"
+            },
             "require-dev": {
-                "devster/ubench": "1.1.*-dev",
-                "phpunit/phpunit": "3.*"
+                "devster/ubench": "dev-master",
+                "friendsofphp/php-cs-fixer": "^2.16",
+                "php-coveralls/php-coveralls": "^2.4",
+                "phpunit/php-code-coverage": "^9.2",
+                "phpunit/phpunit": "^9"
             },
             "type": "library",
             "autoload": {
@@ -37,18 +43,20 @@
             "authors": [
                 {
                     "name": "Yuki Matsukura",
-                    "email": "matsubokkuri@gmail.com"
+                    "email": "matsubokkuri@gmail.com",
+                    "homepage": "https://matsu.teraren.com/"
                 }
             ],
             "description": "Wrapping Redis's sorted set APIs for specializing ranking operations.",
             "homepage": "https://github.com/matsubo/redis-ranking",
             "keywords": [
+                "Social Game",
                 "ranking",
                 "realtime",
                 "redis",
-                "sort"
+                "sorted set"
             ],
-            "time": "2013-04-28T04:56:15+00:00"
+            "time": "2020-11-26T14:22:02+00:00"
         }
     ],
     "packages-dev": [],
