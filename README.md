@@ -11,6 +11,7 @@ Requirements
 - PHP
   - `>=5.5`
   - `>=7`
+  - `>=8`
 - php-redis
 - Redis server
 
