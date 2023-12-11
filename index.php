@@ -86,7 +86,9 @@ require_once __DIR__ . '/vendor/autoload.php';
 use Matsubo\Redis\Ranking;
 
 $redis = new \Redis;
-$redis->connect('127.0.0.1', 6379);
+$redis->connect('redis-15189.c290.ap-northeast-1-2.ec2.cloud.redislabs.com', 15189);
+$redis->auth(['NOYoAfaQFvlRRWxVcEkFMqdaVRSVUB17']);
+
 
 $ranking = new Ranking($key = 'akb', $redis);
 
