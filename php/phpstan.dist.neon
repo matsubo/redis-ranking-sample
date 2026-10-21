@@ -6,6 +6,4 @@ parameters:
         - tests
         - import.php
         - ../public/index.php
-    stubFiles:
-        - stubs/Ranking.stub
     tmpDir: /tmp/phpstan

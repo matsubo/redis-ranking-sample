@@ -5,23 +5,25 @@ declare(strict_types=1);
 namespace App\Domain;
 
 use App\Infrastructure\RedisProvider;
+use Matsubo\Redis\ExpireMode;
 use Matsubo\Redis\Ranking;
 
 /**
  * At most $limit votes per voter in any sliding window of $windowMs.
  *
  * Each voter has a redis/ranking set of their own votes, scored by the time
- * of the vote. One MULTI/EXEC transaction drops the votes that left the
- * window, adds this vote and counts the set, so every request's count
- * includes every vote added before it: when two replicas race for the last
- * slot, the second one counts limit + 1 and is refused. A refused vote is
- * removed again afterwards; until then it can only make a concurrent request
- * count high (refuse), never let one exceed the limit. Admission depends on
- * the count, not on the timestamps, so pod clock skew does not matter.
+ * of the vote. A request drops the votes that left the window, adds its own
+ * vote, then counts the set: the vote is counted when the count is within the
+ * limit, otherwise it is removed again.
  *
- * The range delete, the count and the key's TTL use the Redis connection
- * directly: redis/ranking 1.3 has no range delete or expiry, and its
- * countUsers()/deleteUser() call zSize()/zDelete(), which phpredis 6 removed.
+ * No lock or transaction is needed: a counted vote stays in the set until it
+ * leaves the window, so the count a request sees right after adding itself
+ * includes every counted vote in the window. When two replicas race for the
+ * last slot, at least one of them sees limit + 1 and refuses. A refused vote
+ * that has not been removed yet can only make another request refuse too,
+ * never let one through. Admission depends on the count, not on the
+ * timestamps' order, so a late request with an earlier timestamp is refused
+ * like any other.
  */
 final readonly class VoteLimiter
 {
@@ -40,35 +42,24 @@ final readonly class VoteLimiter
 
     public function attempt(string $voter, int $nowMs): VoteQuota
     {
-        $key = self::KEY_PREFIX . $voter;
-        $redis = $this->redis->get();
-        $votes = new Ranking($key, $redis);
+        $votes = new Ranking(self::KEY_PREFIX . $voter, $this->redis->get());
         $vote = $nowMs . ':' . bin2hex(random_bytes(6));
 
-        $redis->multi();
-        $redis->zRemRangeByScore($key, '-inf', (string) ($nowMs - $this->windowMs));
+        $votes->deleteUsersByScores('-inf', $nowMs - $this->windowMs);
         $votes->setUserScore($vote, $nowMs);
-        $redis->zCard($key);
-        // A new key gets a TTL even if this process dies before the end; an
-        // existing TTL is left alone so refused attempts do not extend it.
-        $redis->pExpire($key, $this->windowMs, 'NX');
-        $result = $redis->exec();
+        // A new set gets an expiry even if this request dies before the end;
+        // an existing one keeps its expiry, so refused attempts do not extend it.
+        $votes->expire($this->windowMs, ExpireMode::IfNone);
 
-        $count = \is_array($result) ? $result[2] ?? null : null;
-        if (!\is_int($count)) {
-            throw new \RuntimeException("Vote limit transaction failed for {$voter}");
-        }
-
-        if ($count <= $this->limit) {
-            $redis->pExpire($key, $this->windowMs);
+        if ($votes->countUsers() <= $this->limit) {
+            $votes->expire($this->windowMs);
 
             return VoteQuota::granted();
         }
 
-        $redis->zRem($key, $vote);
+        $votes->deleteUser($vote);
         // The oldest vote in the window is the next one to expire.
-        $oldest = $votes->getRange(0, 0, true);
-        $oldestAt = $oldest === false || $oldest === [] ? $nowMs : (int) reset($oldest);
+        $oldestAt = (int) (array_values($votes->getRangeWithScores(0, 0))[0] ?? $nowMs);
 
         return VoteQuota::denied($oldestAt + $this->windowMs - $nowMs);
     }

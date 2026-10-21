@@ -24,12 +24,8 @@ final readonly class Ballot
     {
         $standings = [];
         $rank = 0;
-        $scores = $this->ranking()->getRange(0, -1, true);
-        if ($scores === false) {
-            throw new \RuntimeException('Could not read the ranking');
-        }
-        foreach ($scores as $name => $score) {
-            // Numeric member names come back from phpredis as int keys.
+        foreach ($this->ranking()->getRangeWithScores() as $name => $score) {
+            // Numeric member names come back as int keys.
             $standings[] = new Standing(++$rank, (string) $name, self::votes($score));
         }
 
@@ -38,7 +34,7 @@ final readonly class Ballot
 
     public function has(string $name): bool
     {
-        return $this->ranking()->getScore($name) !== false;
+        return $this->ranking()->getScore($name) !== null;
     }
 
     /** Adds one vote for an existing member and returns the new standing. */
@@ -46,10 +42,7 @@ final readonly class Ballot
     {
         $ranking = $this->ranking();
         $score = $ranking->incrementScore($name, -1);
-        $rank = $ranking->getRank($name);
-        if (!\is_float($score) || !\is_int($rank)) {
-            throw new \RuntimeException("Could not record a vote for {$name}");
-        }
+        $rank = $ranking->getRank($name) ?? throw new \RuntimeException("{$name} vanished while voting");
 
         return new Standing($rank + 1, $name, self::votes($score));
     }
@@ -65,20 +58,14 @@ final readonly class Ballot
     public function addMissing(iterable $names): array
     {
         $ranking = $this->ranking();
-        $existing = $ranking->getRange(0, -1);
-        if ($existing === false) {
-            throw new \RuntimeException('Could not read the ranking');
-        }
-        $known = array_fill_keys(array_map('strval', $existing), true);
+        $known = array_fill_keys($ranking->getRange(), true);
         $added = [];
         foreach ($names as $name) {
             $name = trim($name);
             if ($name === '' || isset($known[$name])) {
                 continue;
             }
-            if ($ranking->setUserScore($name, 0) === false) {
-                throw new \RuntimeException("Could not add {$name}");
-            }
+            $ranking->setUserScore($name, 0);
             $known[$name] = true;
             $added[] = $name;
         }

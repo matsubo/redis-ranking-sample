@@ -29,7 +29,6 @@ php/src/Controller/       RankingController: GET / renders, POST / votes, /index
 php/src/View/             View (plain PHP templates), Assets (?v=mtime URLs), e()
 php/templates/            layout, page (with JSON-LD ItemList) and partials
 php/import.php            member.txt → Redis
-php/stubs/Ranking.stub    accurate types of redis/ranking for PHPStan
 deploy/apache.conf        Cache-Control for /assets/ (1 year, URLs are versioned), ServerTokens Prod
 ```
 
@@ -40,10 +39,10 @@ Vote limit
 One IP address may cast at most 100 votes in any 24 hours (sliding window). IPv6 is
 counted per /64. The address is Cloudflare's `Cf-Connecting-Ip`; the only public path is
 Cloudflare → tunnel → Traefik, and Cloudflare overwrites that header. Each address has a
-redis/ranking set `vote-limit:<ip>` of its votes scored by time. One MULTI/EXEC adds the
-vote and counts the set, so the two replicas cannot both take the last slot; the key
-expires 24 hours after the last counted vote. Over the limit, a vote gets 429 with
-`Retry-After`.
+redis/ranking set `vote-limit:<ip>` of its votes scored by time. A request adds its vote and
+then counts the set; a counted vote stays there until it leaves the window, so two replicas
+cannot both take the last slot and no transaction is needed. The key expires 24 hours after
+the last counted vote. Over the limit, a vote gets 429 with `Retry-After`.
 
 
 Development tools
