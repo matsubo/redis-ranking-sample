@@ -19,7 +19,7 @@ if ($lines === false) {
 
 try {
     $added = new Ballot(RedisProvider::fromEnvironment())->addMissing($lines);
-} catch (\RedisException $e) {
+} catch (\RedisException|\RuntimeException $e) {
     fwrite(\STDERR, 'Redis error: ' . $e->getMessage() . "\n");
     exit(1);
 }

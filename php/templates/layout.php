@@ -9,21 +9,25 @@ use function App\View\e;
 /**
  * @var string $content
  * @var Assets $assets
+ * @var string $siteUrl
+ * @var int $voteLimit
  */
+$description = "AKB48の現役・卒業メンバーに24時間で{$voteLimit}票まで投票できる、非公式のリアルタイム人気ランキング。";
 ?>
 <!DOCTYPE html>
 <html lang="ja" class="motion-safe:scroll-smooth">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>AKB勝手に総選挙 — 開票速報</title>
-  <meta name="description" content="AKBグループのメンバーに誰でも何度でも投票できる、勝手に総選挙のリアルタイムランキング。">
+  <title>AKB48メンバー人気投票・リアルタイムランキング | AKB勝手に総選挙</title>
+  <meta name="description" content="<?= e($description) ?>">
+  <link rel="canonical" href="<?= e($siteUrl) ?>/">
   <meta name="author" content="Yuki Matsukura">
   <meta name="theme-color" content="#0d0a12">
-  <meta property="og:title" content="AKB勝手に総選挙">
-  <meta property="og:description" content="応援したいメンバーに投票しよう。リアルタイム開票中。">
+  <meta property="og:title" content="AKB48メンバー人気投票 | AKB勝手に総選挙">
+  <meta property="og:description" content="<?= e($description) ?>">
   <meta property="og:type" content="website">
-  <meta property="og:url" content="https://ranking.teraren.com/">
+  <meta property="og:url" content="<?= e($siteUrl) ?>/">
   <meta property="og:site_name" content="AKB勝手に総選挙">
   <meta property="og:locale" content="ja_JP">
   <meta property="og:image" content="<?= e($assets->absoluteUrl('/assets/og.jpg')) ?>">
@@ -34,8 +38,8 @@ use function App\View\e;
   <meta name="twitter:creator" content="@matsubokkuri">
 
   <link rel="icon" href="/favicon.ico" sizes="32x32">
-  <link rel="icon" href="/assets/ico/icon.svg" type="image/svg+xml">
-  <link rel="apple-touch-icon" href="/assets/ico/apple-touch-icon.png">
+  <link rel="icon" href="<?= e($assets->url('/assets/ico/icon.svg')) ?>" type="image/svg+xml">
+  <link rel="apple-touch-icon" href="<?= e($assets->url('/assets/ico/apple-touch-icon.png')) ?>">
 
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -59,7 +63,7 @@ use function App\View\e;
 <header class="sticky top-0 z-50 border-b border-line bg-ink/70 backdrop-blur-lg backdrop-saturate-150">
   <div class="mx-auto flex h-16 w-[min(1080px,100%-2.5rem)] items-center justify-between gap-4">
     <a href="/" class="flex items-center gap-2.5 font-display text-lg tracking-wide text-fg no-underline">
-      <img src="/assets/ico/icon.svg" alt="" class="size-8" width="32" height="32">
+      <img src="<?= e($assets->url('/assets/ico/icon.svg')) ?>" alt="" class="size-8" width="32" height="32">
       <span>AKB<span class="text-pink">勝手に</span>総選挙</span>
     </a>
     <span class="inline-flex items-center gap-2 rounded-full border border-pink/50 px-3 py-1 text-xs font-bold tracking-[0.15em] text-pink">

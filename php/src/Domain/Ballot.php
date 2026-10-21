@@ -76,7 +76,9 @@ final readonly class Ballot
             if ($name === '' || isset($known[$name])) {
                 continue;
             }
-            $ranking->setUserScore($name, 0);
+            if ($ranking->setUserScore($name, 0) === false) {
+                throw new \RuntimeException("Could not add {$name}");
+            }
             $known[$name] = true;
             $added[] = $name;
         }

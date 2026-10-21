@@ -11,6 +11,8 @@ use function App\View\e;
  * @var View $view
  * @var list<Standing> $members
  * @var int $totalVotes
+ * @var int $voteLimit
+ * @var string $siteUrl
  * @var string $csrfToken
  * @var string $error
  * @var string $fetchError
@@ -19,7 +21,7 @@ $topVotes = $members[0]->votes ?? 0;
 $leader = $members[0]->name ?? '—';
 ?>
 <?php if ($members !== []): ?>
-<div class="overflow-hidden border-y border-black/20 bg-pink text-sm font-bold whitespace-nowrap text-white" aria-hidden="true">
+<div class="overflow-hidden border-y border-black/20 bg-pink text-sm font-bold whitespace-nowrap text-ink" aria-hidden="true">
   <div class="flex w-max motion-safe:animate-ticker">
     <?php for ($copy = 0; $copy < 2; $copy++): ?>
     <span class="py-2">
@@ -37,15 +39,15 @@ $leader = $members[0]->name ?? '—';
 <main class="mx-auto w-[min(1080px,100%-2.5rem)]">
 
   <section class="pt-12 pb-8 sm:pt-24 sm:pb-12">
-    <p class="mb-4 text-xs font-bold tracking-[0.3em] text-gold motion-safe:animate-rise">UNOFFICIAL GENERAL ELECTION</p>
-    <h1 class="font-display text-[clamp(2.6rem,9vw,6.2rem)] leading-[1.05] font-normal tracking-tight motion-safe:animate-rise [animation-delay:80ms]">
+    <p class="mb-4 text-xs font-bold tracking-[0.3em] text-gold">UNOFFICIAL GENERAL ELECTION</p>
+    <h1 class="font-display text-[clamp(2.6rem,9vw,6.2rem)] leading-[1.05] font-normal tracking-tight">
       AKB勝手に<span class="block text-pink drop-shadow-[0_0_28px_rgb(255_61_139/0.45)]">総選挙</span>
     </h1>
-    <p class="mt-6 max-w-[34em] text-lg text-muted motion-safe:animate-rise [animation-delay:160ms]">
-      応援したいメンバーに投票しよう。ワンタップで1票、何度でも。順位はリアルタイムで更新されます。
+    <p class="mt-6 max-w-[34em] text-lg text-muted">
+      AKB48の現役・卒業メンバーの人気投票。応援したいメンバーに投票しよう。ワンタップで1票、24時間で<?= $voteLimit ?>票まで。順位はリアルタイムで更新されます。
     </p>
 
-    <dl class="mt-10 grid grid-cols-2 gap-px overflow-hidden rounded-3xl border border-line bg-line sm:grid-cols-3 motion-safe:animate-rise [animation-delay:240ms]">
+    <dl class="mt-10 grid grid-cols-2 gap-px overflow-hidden rounded-3xl border border-line bg-line sm:grid-cols-3">
       <div class="bg-panel/85 px-5 py-4">
         <dt class="text-xs tracking-[0.15em] text-muted">エントリー</dt>
         <dd class="mt-1 font-display text-2xl tabular-nums sm:text-3xl"><?= number_format(count($members)) ?><small class="ml-1 font-sans text-xs font-bold text-muted">名</small></dd>
@@ -81,17 +83,20 @@ $leader = $members[0]->name ?? '—';
     <?php if ($fetchError !== ''): ?>
     <div role="alert" class="rounded-xl border border-l-[6px] border-pink/50 bg-pink/10 px-5 py-4 font-bold"><?= e($fetchError) ?></div>
     <?php else: ?>
-    <ol id="board" class="grid grid-cols-1 gap-2.5 sm:grid-cols-2">
-      <?php foreach ($members as $i => $m): ?>
-      <?= $view->render($m->rank <= 3 ? 'partials/podium' : 'partials/row', [
-          'member' => $m,
-          'share' => $topVotes > 0 ? round($m->votes / $topVotes * 100, 2) : 0,
-          // The first 24 entries fade in one after another.
-          'delay' => $i < 24 ? 300 + $i * 35 : null,
-          'csrfToken' => $csrfToken,
-      ]) ?>
-      <?php endforeach; ?>
-    </ol>
+    <form id="vote-form" method="post" action="/">
+      <input type="hidden" name="csrf_token" value="<?= e($csrfToken) ?>">
+      <input type="hidden" name="mode" value="increment">
+      <ol id="board" class="grid grid-cols-1 gap-2.5 sm:grid-cols-2">
+        <?php foreach ($members as $i => $m): ?>
+        <?= $view->render($m->rank <= 3 ? 'partials/podium' : 'partials/row', [
+            'member' => $m,
+            'share' => $topVotes > 0 ? round($m->votes / $topVotes * 100, 2) : 0,
+            // The first 24 entries fade in one after another.
+            'delay' => $i < 24 ? 300 + $i * 35 : null,
+        ]) ?>
+        <?php endforeach; ?>
+      </ol>
+    </form>
     <p id="no-hit" class="mt-4 rounded-3xl border border-dashed border-line p-8 text-center text-muted" hidden>該当するメンバーがいません。</p>
     <?php endif; ?>
   </section>
@@ -110,3 +115,23 @@ $leader = $members[0]->name ?? '—';
     </section>
   </div>
 </main>
+<?php if ($members !== []): ?>
+<script type="application/ld+json"><?= json_encode([
+    '@context' => 'https://schema.org',
+    '@graph' => [
+        ['@type' => 'WebSite', '@id' => $siteUrl . '/#website', 'url' => $siteUrl . '/', 'name' => 'AKB勝手に総選挙', 'inLanguage' => 'ja'],
+        [
+            '@type' => 'ItemList',
+            'name' => 'AKB48メンバー人気投票ランキング',
+            'numberOfItems' => count($members),
+            'itemListOrder' => 'https://schema.org/ItemListOrderDescending',
+            'itemListElement' => array_map(static fn(Standing $m): array => [
+                '@type' => 'ListItem',
+                'position' => $m->rank,
+                'name' => $m->name,
+                'url' => $siteUrl . '/#' . $m->anchor(),
+            ], $members),
+        ],
+    ],
+], \JSON_UNESCAPED_UNICODE | \JSON_UNESCAPED_SLASHES | \JSON_HEX_TAG | \JSON_HEX_AMP | \JSON_THROW_ON_ERROR) ?></script>
+<?php endif; ?>

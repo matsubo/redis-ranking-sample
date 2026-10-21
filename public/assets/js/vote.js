@@ -1,9 +1,11 @@
 // Member filter and in-place voting for the ranking board. Loaded with defer,
-// so the document is parsed when this runs. Without JS the forms post
-// normally and the server redirects back to the member's row.
+// so the document is parsed when this runs. The board is one form; each vote
+// button submits it with text=<member>. Without JS the form posts normally and
+// the server redirects back to the member's row.
 (() => {
+  const form = document.getElementById('vote-form');
   const board = document.getElementById('board');
-  if (!board) return;
+  if (!form || !board) return;
   const items = [...board.querySelectorAll('li[data-name]')];
   const toast = document.getElementById('toast');
   const total = document.querySelector('[data-total]');
@@ -43,16 +45,19 @@
     }
   };
 
-  board.addEventListener('submit', async (event) => {
+  form.addEventListener('submit', async (event) => {
+    const button = event.submitter;
+    if (!button) return;
     event.preventDefault();
-    const form = event.target;
-    const li = form.closest('li');
-    const button = form.querySelector('button');
+    const li = button.closest('li');
+    // Read the form before disabling the button: a disabled submitter's
+    // text=<member> would be left out.
+    const body = new FormData(form, button);
     button.disabled = true;
     try {
       const res = await fetch(form.action, {
         method: 'POST',
-        body: new FormData(form),
+        body,
         headers: { Accept: 'application/json' },
       });
       const data = await res.json().catch(() => ({}));

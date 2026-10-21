@@ -20,15 +20,17 @@ Layout
 ---
 
 ```
-public/index.php        front controller: wires the objects, handles the request
-public/assets/js/vote.js  member filter and in-place voting
-php/src/Domain/         Ballot (members and votes), VoteLimiter (per-IP quota), both on redis/ranking
-php/src/Http/           Request, Response, CsrfToken, Voter (client IP)
-php/src/Controller/     RankingController: GET / renders, POST / votes
-php/src/View/           View (plain PHP templates), Assets (?v=mtime URLs), e()
-php/templates/          layout, page and partials
-php/import.php          member.txt → Redis
-php/stubs/Ranking.stub  accurate types of redis/ranking for PHPStan
+public/index.php          front controller: wires the objects, handles the request
+public/assets/js/vote.js  member filter and in-place voting (the board is one form)
+public/robots.txt, sitemap.xml
+php/src/Domain/           Ballot (members and votes), VoteLimiter (per-IP quota), both on redis/ranking
+php/src/Http/             Request, Response, CsrfToken, Voter (client IP)
+php/src/Controller/       RankingController: GET / renders, POST / votes, /index.php → 301 /
+php/src/View/             View (plain PHP templates), Assets (?v=mtime URLs), e()
+php/templates/            layout, page (with JSON-LD ItemList) and partials
+php/import.php            member.txt → Redis
+php/stubs/Ranking.stub    accurate types of redis/ranking for PHPStan
+deploy/apache.conf        Cache-Control for /assets/ (1 year, URLs are versioned), ServerTokens Prod
 ```
 
 
@@ -38,8 +40,10 @@ Vote limit
 One IP address may cast at most 100 votes in any 24 hours (sliding window). IPv6 is
 counted per /64. The address is Cloudflare's `Cf-Connecting-Ip`; the only public path is
 Cloudflare → tunnel → Traefik, and Cloudflare overwrites that header. Each address has a
-redis/ranking set `vote-limit:<ip>` of its votes scored by time, which expires with the
-window. Over the limit, a vote gets 429 with `Retry-After`.
+redis/ranking set `vote-limit:<ip>` of its votes scored by time. One MULTI/EXEC adds the
+vote and counts the set, so the two replicas cannot both take the last slot; the key
+expires 24 hours after the last counted vote. Over the limit, a vote gets 429 with
+`Retry-After`.
 
 
 Development tools

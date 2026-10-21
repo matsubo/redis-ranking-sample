@@ -27,10 +27,17 @@ final readonly class RankingController
         private VoteLimiter $limiter,
         private View $view,
         private Assets $assets,
+        /** Canonical origin without a trailing slash, e.g. https://ranking.teraren.com */
+        private string $siteUrl,
     ) {}
 
     public function handle(Request $request): Response
     {
+        // Apache also serves this script as /index.php; keep one canonical URL.
+        if ($request->path === '/index.php') {
+            return Response::redirect('/', 301);
+        }
+
         $csrf = CsrfToken::fromRequest($request);
 
         $response = match (true) {
@@ -59,6 +66,8 @@ final readonly class RankingController
             'error' => $error,
             'fetchError' => $fetchError,
             'assets' => $this->assets,
+            'siteUrl' => $this->siteUrl,
+            'voteLimit' => $this->limiter->limit(),
         ]), $status);
     }
 

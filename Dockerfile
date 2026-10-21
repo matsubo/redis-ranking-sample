@@ -46,6 +46,11 @@ LABEL org.opencontainers.image.source=https://github.com/matsubo/redis-ranking-s
 # Don't advertise the PHP version in X-Powered-By.
 RUN printf 'expose_php = Off\n' > "$PHP_INI_DIR/conf.d/zz-app.ini"
 
+# Cache headers for static files, no version in Server / error pages.
+# zz- so it loads after Debian's security.conf, which sets ServerTokens OS.
+COPY deploy/apache.conf /etc/apache2/conf-available/zz-app.conf
+RUN a2enmod headers && a2enconf zz-app
+
 WORKDIR /var/www/html
 COPY php /var/www/php
 COPY --from=vendor /var/www/php/vendor /var/www/php/vendor

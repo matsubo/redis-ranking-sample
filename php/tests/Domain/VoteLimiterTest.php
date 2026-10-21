@@ -61,6 +61,30 @@ final class VoteLimiterTest extends TestCase
         self::assertSame(2, $this->redis->get()->zCard(VoteLimiter::KEY_PREFIX . $this->voter));
     }
 
+    public function testAVoteThatArrivesLateWithAnEarlierTimestampIsStillRefused(): void
+    {
+        // A request stamped before the others (slow replica, clock skew) sorts
+        // ahead of them in the set; it must still count as the 4th vote.
+        $limiter = new VoteLimiter($this->redis, 3, self::WINDOW);
+        $limiter->attempt($this->voter, 20_000);
+        $limiter->attempt($this->voter, 20_001);
+        $limiter->attempt($this->voter, 20_002);
+
+        self::assertFalse($limiter->attempt($this->voter, 10_000)->allowed);
+        self::assertSame(3, $this->redis->get()->zCard(VoteLimiter::KEY_PREFIX . $this->voter));
+    }
+
+    public function testRefusedAttemptsDoNotExtendTheKeyLifetime(): void
+    {
+        $limiter = new VoteLimiter($this->redis, 1, self::WINDOW);
+        $key = VoteLimiter::KEY_PREFIX . $this->voter;
+        $limiter->attempt($this->voter, 1_000);
+        $this->redis->get()->pExpire($key, 5_000);
+
+        self::assertFalse($limiter->attempt($this->voter, 2_000)->allowed);
+        self::assertLessThanOrEqual(5_000, $this->redis->get()->pttl($key));
+    }
+
     public function testVotersAreCountedSeparately(): void
     {
         $limiter = new VoteLimiter($this->redis, 1, self::WINDOW);

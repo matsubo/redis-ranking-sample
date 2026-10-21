@@ -16,12 +16,14 @@ use App\View\View;
 $app = dirname(__DIR__) . '/php';
 require $app . '/vendor/autoload.php';
 
+$siteUrl = 'https://ranking.teraren.com';
 $redis = RedisProvider::fromEnvironment();
 $controller = new RankingController(
     new Ballot($redis),
     new VoteLimiter($redis),
     new View($app . '/templates'),
-    new Assets(__DIR__, 'https://ranking.teraren.com'),
+    new Assets(__DIR__, $siteUrl),
+    $siteUrl,
 );
 
 $controller->handle(Request::fromGlobals())->send();
