@@ -13,6 +13,46 @@ Requirements
 - Redis server
 - Node.js (only for building the CSS; the Docker image builds it in its own stage)
 
+Docker covers all of these; nothing has to be installed on the host.
+
+
+Layout
+---
+
+```
+public/index.php        front controller: wires the objects, handles the request
+public/assets/js/vote.js  member filter and in-place voting
+php/src/Domain/         Ballot (members and votes), VoteLimiter (per-IP quota), both on redis/ranking
+php/src/Http/           Request, Response, CsrfToken, Voter (client IP)
+php/src/Controller/     RankingController: GET / renders, POST / votes
+php/src/View/           View (plain PHP templates), Assets (?v=mtime URLs), e()
+php/templates/          layout, page and partials
+php/import.php          member.txt → Redis
+php/stubs/Ranking.stub  accurate types of redis/ranking for PHPStan
+```
+
+
+Vote limit
+---
+
+One IP address may cast at most 100 votes in any 24 hours (sliding window). IPv6 is
+counted per /64. The address is Cloudflare's `Cf-Connecting-Ip`; the only public path is
+Cloudflare → tunnel → Traefik, and Cloudflare overwrites that header. Each address has a
+redis/ranking set `vote-limit:<ip>` of its votes scored by time, which expires with the
+window. Over the limit, a vote gets 429 with `Retry-After`.
+
+
+Development tools
+---
+
+PHP-CS-Fixer (PER-CS 3.0), PHPStan (level max) and PHPUnit run in the image's `dev` stage:
+
+```
+% docker compose run --rm php install   # composer install into php/vendor
+% docker compose run --rm php check     # lint + PHPStan + PHPUnit (needs the compose Redis)
+% docker compose run --rm php fix       # apply the formatter
+```
+
 
 Local preview
 ---
@@ -22,8 +62,8 @@ Local preview
 ```
 
 Open http://localhost:8080 in Chrome or Firefox. The `seed` service imports `php/member.txt`
-into Redis on startup. `public/` and `src/` are bind-mounted and the `css` service rebuilds
-Tailwind on change, so edits show on reload.
+into Redis on startup. `public/`, `php/src/` and `php/templates/` are bind-mounted, and
+`docker compose up css` rebuilds Tailwind on change, so edits show on reload.
 
 Without Docker, CSS only:
 
@@ -37,8 +77,8 @@ OG image
 ---
 
 `public/assets/og.jpg` (1200×630) is a screenshot of `src/og.html`; the command to
-regenerate it is at the top of that file. `index.php` appends the file's mtime to the
-`og:image` URL, so X and other crawlers fetch the new image instead of a cached one.
+regenerate it is at the top of that file. `og:image` carries the file's mtime as `?v=`,
+so X and other crawlers fetch the new image instead of a cached one.
 
 
 Seed data

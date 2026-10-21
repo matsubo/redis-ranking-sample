@@ -1,64 +1,30 @@
 <?php
 
-require_once '../vendor/autoload.php';
+declare(strict_types=1);
 
-use Matsubo\Redis\Ranking;
+// Adds the members in member.txt that are missing from Redis with 0 votes;
+// existing members keep their votes, so it is safe to re-run.
+//   php import.php
 
-$member_text = file_get_contents('member.txt');
-if ($member_text === false) {
-    fwrite(STDERR, "Error: Cannot read member.txt\n");
+use App\Domain\Ballot;
+use App\Infrastructure\RedisProvider;
+
+require __DIR__ . '/vendor/autoload.php';
+
+$lines = file(__DIR__ . '/member.txt', \FILE_IGNORE_NEW_LINES);
+if ($lines === false) {
+    fwrite(\STDERR, "Error: Cannot read member.txt\n");
     exit(1);
 }
 
-$redis = new \Redis;
 try {
-    $redis->connect(getenv('REDIS_HOST'), (int)getenv('REDIS_PORT'));
-    $redis->auth([getenv('REDIS_PASSWORD')]);
+    $added = new Ballot(RedisProvider::fromEnvironment())->addMissing($lines);
 } catch (\RedisException $e) {
-    fwrite(STDERR, "Redis connection failed: " . $e->getMessage() . "\n");
+    fwrite(\STDERR, 'Redis error: ' . $e->getMessage() . "\n");
     exit(1);
 }
 
-$key = 'akb';
-$ranking = new Ranking($key, $redis);
-
-
-// initialize code.
-$member_array = explode("\n", $member_text);
-
-// Get all existing members at once
-$existing_members = array_flip($ranking->getRange(0, -1));
-
-// Filter members that need to be added
-$members_to_add = [];
-foreach ($member_array as $member) {
-    $member = trim($member);
-    if (!$member) {
-        continue;
-    }
-    if (!isset($existing_members[$member])) {
-        $members_to_add[] = $member;
-    }
+foreach ($added as $name) {
+    echo "Added: {$name}\n";
 }
-
-// Batch add using pipeline
-if (!empty($members_to_add)) {
-    $redis->multi(\Redis::PIPELINE);
-    foreach ($members_to_add as $member) {
-        $redis->zadd($key, 0, $member);
-    }
-    $results = $redis->exec();
-
-    $added = 0;
-    foreach ($members_to_add as $i => $member) {
-        if ($results[$i] !== false) {
-            print "Added: $member\n";
-            $added++;
-        } else {
-            fwrite(STDERR, "Failed to add: $member\n");
-        }
-    }
-    print "\nTotal added: $added members\n";
-} else {
-    print "All members already exist. Nothing to add.\n";
-}
+echo $added === [] ? "All members already exist. Nothing to add.\n" : "\nTotal added: " . count($added) . " members\n";

@@ -1,0 +1,11 @@
+parameters:
+    level: max
+    paths:
+        - src
+        - templates
+        - tests
+        - import.php
+        - ../public/index.php
+    stubFiles:
+        - stubs/Ranking.stub
+    tmpDir: /tmp/phpstan

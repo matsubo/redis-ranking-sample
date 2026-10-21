@@ -1,6 +1,7 @@
 @import "tailwindcss";
 
 @source "../public";
+@source "../php/templates";
 
 @theme {
   --color-ink: #0d0a12;

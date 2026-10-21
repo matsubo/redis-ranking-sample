@@ -1,5 +1,40 @@
 {
+    "name": "matsubo/redis-ranking-sample",
+    "description": "AKB勝手に総選挙: a sample application for redis/ranking",
+    "type": "project",
+    "license": "GPL-3.0-or-later",
     "require": {
-        "redis/ranking": "1.*"
+        "php": "^8.5",
+        "ext-redis": "^6.3",
+        "redis/ranking": "^1.3"
+    },
+    "require-dev": {
+        "friendsofphp/php-cs-fixer": "^3.95",
+        "phpstan/phpstan": "^2.3",
+        "phpunit/phpunit": "^13.4"
+    },
+    "autoload": {
+        "psr-4": {
+            "App\\": "src/"
+        },
+        "files": [
+            "src/View/functions.php"
+        ]
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "App\\Tests\\": "tests/"
+        }
+    },
+    "config": {
+        "sort-packages": true,
+        "optimize-autoloader": true
+    },
+    "scripts": {
+        "fix": "php-cs-fixer fix",
+        "lint": "php-cs-fixer check --diff",
+        "stan": "phpstan analyse --memory-limit=512M",
+        "test": "phpunit",
+        "check": ["@lint", "@stan", "@test"]
     }
 }

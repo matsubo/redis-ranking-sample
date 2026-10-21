@@ -1,7 +1,12 @@
 # Local preview: docker compose up --build → http://localhost:8080
-# public/ and src/ are bind-mounted, so PHP and Tailwind edits show on reload.
-# Use Chrome or Firefox: the CSRF cookie is Secure, which they accept on
-# http://localhost.
+# public/, php/src/ and php/templates/ are bind-mounted, so PHP, template and
+# Tailwind edits show on reload. Use Chrome or Firefox: the CSRF cookie is
+# Secure, which they accept on http://localhost.
+#
+# Dev tools (not started by `up`):
+#   docker compose run --rm php install   # composer install into php/vendor
+#   docker compose run --rm php check     # php-cs-fixer check, PHPStan, PHPUnit
+#   docker compose run --rm php fix       # apply php-cs-fixer
 
 x-redis-env: &redis-env
   REDIS_HOST: redis
@@ -40,6 +45,22 @@ services:
     environment: *redis-env
     volumes:
       - ./public:/var/www/html
+      - ./php/src:/var/www/php/src
+      - ./php/templates:/var/www/php/templates
     depends_on:
       seed:
         condition: service_completed_successfully
+
+  php:
+    build:
+      context: .
+      target: dev
+    profiles: [tools]
+    working_dir: /app/php
+    entrypoint: ["composer"]
+    environment: *redis-env
+    volumes:
+      - .:/app
+    depends_on:
+      redis:
+        condition: service_healthy
