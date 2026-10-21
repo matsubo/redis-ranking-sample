@@ -33,6 +33,14 @@ Without Docker, CSS only:
 ```
 
 
+OG image
+---
+
+`public/assets/og.jpg` (1200×630) is a screenshot of `src/og.html`; the command to
+regenerate it is at the top of that file. `index.php` appends the file's mtime to the
+`og:image` URL, so X and other crawlers fetch the new image instead of a cached one.
+
+
 Seed data
 ---
 

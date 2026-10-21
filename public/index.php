@@ -122,6 +122,8 @@ $voteButton = 'inline-flex cursor-pointer items-center gap-1.5 rounded-full bg-p
 $voteIcon = '<svg aria-hidden="true" class="size-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21s-7.5-4.6-9.5-9.2C1 8.2 3.4 4.5 7 4.5c2.1 0 3.6 1.1 5 2.9 1.4-1.8 2.9-2.9 5-2.9 3.6 0 6 3.7 4.5 7.3C19.5 16.4 12 21 12 21z"/></svg>';
 
 $cssVersion = @filemtime(__DIR__ . '/assets/css/app.css') ?: 0;
+// The version query gives crawlers (X caches cards for days) a new URL whenever the image changes.
+$ogImage = 'https://ranking.teraren.com/assets/og.jpg?v=' . (@filemtime(__DIR__ . '/assets/og.jpg') ?: 0);
 
 ?>
 <!DOCTYPE html>
@@ -136,6 +138,15 @@ $cssVersion = @filemtime(__DIR__ . '/assets/css/app.css') ?: 0;
   <meta property="og:title" content="AKB勝手に総選挙">
   <meta property="og:description" content="応援したいメンバーに投票しよう。リアルタイム開票中。">
   <meta property="og:type" content="website">
+  <meta property="og:url" content="https://ranking.teraren.com/">
+  <meta property="og:site_name" content="AKB勝手に総選挙">
+  <meta property="og:locale" content="ja_JP">
+  <meta property="og:image" content="<?= e($ogImage) ?>">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta property="og:image:alt" content="AKB勝手に総選挙 — 開票速報">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:creator" content="@matsubokkuri">
 
   <link rel="icon" href="/favicon.ico" sizes="32x32">
   <link rel="icon" href="/assets/ico/icon.svg" type="image/svg+xml">
