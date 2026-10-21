@@ -1,0 +1,87 @@
+@import "tailwindcss";
+
+@source "../public";
+
+@theme {
+  --color-ink: #0d0a12;
+  --color-panel: #17121d;
+  --color-panel-2: #1f1827;
+  --color-line: rgb(255 255 255 / 0.08);
+  --color-fg: #f7f1ea;
+  --color-muted: #a69cb0;
+  --color-pink: #ff3d8b;
+  --color-pink-deep: #c2185b;
+  --color-gold: #f4c24f;
+  --color-silver: #cfd6df;
+  --color-bronze: #d9915f;
+
+  --font-display: "Dela Gothic One", "Hiragino Sans", sans-serif;
+  --font-sans: "Zen Kaku Gothic New", "Hiragino Sans", "Yu Gothic", sans-serif;
+
+  --animate-ticker: ticker 45s linear infinite;
+  --animate-rise: rise 0.7s cubic-bezier(0.2, 0.8, 0.2, 1) both;
+  --animate-grow: grow 1s cubic-bezier(0.2, 0.8, 0.2, 1) both;
+  --animate-live: live 1.8s infinite;
+  --animate-voted: voted 1.4s ease-out;
+  --animate-plus: plus 1.2s ease-out both;
+
+  @keyframes ticker {
+    to { transform: translateX(-50%); }
+  }
+  @keyframes rise {
+    from { opacity: 0; transform: translateY(14px); }
+  }
+  @keyframes grow {
+    from { transform: scaleX(0); }
+  }
+  @keyframes live {
+    0% { box-shadow: 0 0 0 0 rgb(255 61 139 / 0.7); }
+    70%, 100% { box-shadow: 0 0 0 10px rgb(255 61 139 / 0); }
+  }
+  @keyframes voted {
+    0% { box-shadow: 0 0 0 0 rgb(255 61 139 / 0.8); background-color: rgb(255 61 139 / 0.22); }
+    100% { box-shadow: 0 0 0 18px rgb(255 61 139 / 0); }
+  }
+  @keyframes plus {
+    from { opacity: 0; transform: translateY(6px); }
+    30% { opacity: 1; }
+    to { opacity: 0; transform: translateY(-18px); }
+  }
+}
+
+@layer base {
+  html {
+    color-scheme: dark;
+    font-feature-settings: "palt";
+  }
+
+  body {
+    background:
+      radial-gradient(60rem 40rem at 85% -10%, rgb(255 61 139 / 0.22), transparent 60%),
+      radial-gradient(50rem 30rem at -10% 20%, rgb(244 194 79 / 0.1), transparent 60%),
+      var(--color-ink);
+  }
+
+  /* film grain */
+  body::before {
+    content: "";
+    position: fixed;
+    inset: 0;
+    z-index: 100;
+    pointer-events: none;
+    opacity: 0.07;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  }
+
+  :focus-visible {
+    outline: 3px solid var(--color-gold);
+    outline-offset: 3px;
+  }
+}
+
+/* Spotlight + stripes behind the 1st–3rd place cards; tinted by --accent. */
+@utility podium-bg {
+  background-image:
+    radial-gradient(30rem 14rem at 100% 0%, color-mix(in srgb, var(--accent) 22%, transparent), transparent 70%),
+    repeating-linear-gradient(-45deg, rgb(255 255 255 / 0.025) 0 2px, transparent 2px 14px);
+}

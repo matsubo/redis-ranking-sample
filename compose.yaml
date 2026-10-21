@@ -1,0 +1,45 @@
+# Local preview: docker compose up --build → http://localhost:8080
+# public/ and src/ are bind-mounted, so PHP and Tailwind edits show on reload.
+# Use Chrome or Firefox: the CSRF cookie is Secure, which they accept on
+# http://localhost.
+
+x-redis-env: &redis-env
+  REDIS_HOST: redis
+  REDIS_PORT: "6379"
+  REDIS_PASSWORD: local
+
+services:
+  redis:
+    image: redis:8-alpine
+    command: ["redis-server", "--requirepass", "local"]
+    healthcheck:
+      test: ["CMD", "redis-cli", "-a", "local", "ping"]
+      interval: 2s
+      retries: 10
+
+  seed:
+    build: .
+    environment: *redis-env
+    working_dir: /var/www/php
+    command: ["php", "import.php"]
+    depends_on:
+      redis:
+        condition: service_healthy
+
+  css:
+    image: node:24-alpine
+    working_dir: /app
+    command: ["sh", "-c", "npm ci && npm run watch"]
+    volumes:
+      - .:/app
+      - /app/node_modules
+
+  app:
+    build: .
+    ports: ["8080:80"]
+    environment: *redis-env
+    volumes:
+      - ./public:/var/www/html
+    depends_on:
+      seed:
+        condition: service_completed_successfully

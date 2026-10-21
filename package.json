@@ -1,0 +1,12 @@
+{
+  "name": "ranking",
+  "private": true,
+  "scripts": {
+    "build": "tailwindcss -i src/app.css -o public/assets/css/app.css --minify",
+    "watch": "tailwindcss -i src/app.css -o public/assets/css/app.css --watch=always"
+  },
+  "devDependencies": {
+    "@tailwindcss/cli": "4.3.3",
+    "tailwindcss": "4.3.3"
+  }
+}

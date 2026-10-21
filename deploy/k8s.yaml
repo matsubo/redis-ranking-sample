@@ -1,0 +1,103 @@
+# Applied by deploy/deploy.sh with IMAGE replaced by
+# ghcr.io/matsubo/redis-ranking-sample:<commit sha>. The namespace, the
+# deployer's RBAC, the ghcr-pull secret and the ranking-env Secret (REDIS_HOST,
+# REDIS_PORT, REDIS_PASSWORD) are cluster-side and live in
+# matsubo/network-setting (k8s/ranking.yaml).
+#
+# The ranking data is in the external Redis Cloud instance and the vote form's
+# CSRF token is a double-submit cookie (public/index.php), so the pods hold no
+# state and any of them can serve any request.
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ranking
+  namespace: ranking
+spec:
+  replicas: 2
+  # A rollout starts a new pod and waits for it to become ready before it
+  # stops an old one, so both replicas keep serving throughout.
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxUnavailable: 0
+      maxSurge: 1
+  selector:
+    matchLabels: { app: ranking }
+  template:
+    metadata:
+      labels: { app: ranking }
+    spec:
+      topologySpreadConstraints:
+        - maxSkew: 1
+          topologyKey: kubernetes.io/hostname
+          whenUnsatisfiable: ScheduleAnyway
+          labelSelector:
+            matchLabels: { app: ranking }
+      containers:
+        - name: ranking
+          image: IMAGE
+          ports:
+            - { name: http, containerPort: 80 }
+          envFrom:
+            - secretRef: { name: ranking-env }
+          # / renders the ranking from Redis; index.php catches Redis errors and
+          # still answers 200, so a Redis outage does not restart the pods.
+          readinessProbe:
+            httpGet: { path: /, port: http }
+            periodSeconds: 10
+            timeoutSeconds: 5
+          livenessProbe:
+            httpGet: { path: /, port: http }
+            periodSeconds: 30
+            timeoutSeconds: 5
+          # Apache stops accepting as soon as it gets the stop signal, but
+          # traefik keeps routing to the pod until it sees the endpoint removed;
+          # without this wait every rolling restart would drop a few requests.
+          lifecycle:
+            preStop:
+              sleep: { seconds: 10 }
+          # Working set 2026-10-07..12 (78h, excluding the 10-09/10 migration):
+          # p95 35 MiB, max 36 MiB; CPU p95 1m, max 4m.
+          resources:
+            requests: { cpu: 10m, memory: 48Mi }
+            limits: { memory: 80Mi }
+---
+# A drain (kubectl drain, kured) evicts at most one ranking pod at a time and
+# waits for its replacement to become ready before taking the next one.
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  name: ranking
+  namespace: ranking
+spec:
+  maxUnavailable: 1
+  selector:
+    matchLabels: { app: ranking }
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: ranking
+  namespace: ranking
+spec:
+  selector: { app: ranking }
+  ports:
+    - { name: http, port: 80, targetPort: http }
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: ranking
+  namespace: ranking
+spec:
+  ingressClassName: traefik
+  rules:
+    - host: ranking.teraren.com
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: ranking
+                port: { name: http }
